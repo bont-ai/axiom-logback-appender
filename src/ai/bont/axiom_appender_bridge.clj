@@ -1,6 +1,4 @@
-(ns ai.bont.axiom-logback-appender
-  (:require
-    [hato.client :as hato])
+(ns ai.bont.axiom-appender-bridge
   (:gen-class
     :extends ch.qos.logback.core.UnsynchronizedAppenderBase
     :name ai.bont.AxiomLogbackAppender
@@ -11,25 +9,19 @@
               [setDatasetName [String] void]
               [setEncoder [net.logstash.logback.encoder.LogstashEncoder] void]]))
 
-(def http-client (hato/build-http-client {}))
-
-(defn send-message!
-  [{:keys [api-domain api-token dataset-name encoder]} event]
-  (try
-    (hato/post (str "https://" api-domain "/v1/datasets/" dataset-name "/ingest")
-               {:http-client  http-client
-                :content-type :json
-                :headers      {"Authorization"   (str "Bearer " api-token)
-                               "X-Axiom-Dataset" dataset-name}
-                :body         (String. (.encode encoder event))})
-    (catch Exception e
-      (println "Failed to send log to Axiom:" (.getMessage e)))))
-
 (defn -init []
   [[] (atom {})])
 
 (defn -append [this e]
-  (send-message! @(.state this) e))
+  (try
+    (require 'ai.bont.axiom-appender-sender)
+    (let [sender-fn (resolve 'ai.bont.axiom-appender-sender/send-message!)]
+      (if sender-fn
+        (sender-fn @(.state this) e)
+        (println "ERROR: Could not resolve sender function")))
+    (catch Exception ex
+      (println "ERROR in -append:" (.getMessage ex))
+      (.printStackTrace ex))))
 
 (defn -setEncoder [this encoder]
   (swap! (.state this) assoc :encoder encoder))

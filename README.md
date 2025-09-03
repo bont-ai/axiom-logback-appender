@@ -7,13 +7,15 @@ Basic [Axiom](https://axiom.co/) logback appender.
 In your project.clj dependencies
 
 ```clj
-[ai.bont/axiom-logback-appender "1.0.0"]
+[ai.bont/axiom-logback-appender "1.0.1"]
+[hato "1.0.0"]
 ```
 
 or deps.edn
 
 ```clj
-ai.bont/axiom-logback-appender {:mvn/version "1.0.0"}
+ai.bont/axiom-logback-appender {:mvn/version "1.0.1"}
+hato/hato {:mvn/version "1.0.0"}}
 ```
 
 Configure it inside your `logback.xml` file. Sample below with environment variables used for api token and dataset
