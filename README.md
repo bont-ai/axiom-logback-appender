@@ -15,7 +15,7 @@ or deps.edn
 
 ```clj
 ai.bont/axiom-logback-appender {:mvn/version "1.0.1"}
-hato/hato {:mvn/version "1.0.0"}}
+hato/hato {:mvn/version "1.0.0"}
 ```
 
 Configure it inside your `logback.xml` file. Sample below with environment variables used for api token and dataset
